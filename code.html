@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Shipment details</title>
+<script type="text/javascript">
+function request_json() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function(){
+	if (this.readyState == 4 && this.status == 200){
+		formData(this.responseText);
+	} else {
+	document.getElementById("response_json").innerHTML = "waiting...";
+	}};
+	xhttp.open("POST", "https://f0ztti2nsk.execute-api.ap-south-1.amazonaws.com/v1/consignment/fetch", true);
+	xhttp.setRequestHeader("Authorization", "Bearer tTU3gFVUdP");
+	xhttp.setRequestHeader("Content-Type", "application/json");
+	xhttp.send("{ \"email\": \"mayankmittal@intugine.com\" }");
+}
+function formData(data){
+	data = JSON.parse(data);
+	var x, y;
+	var DEL=0, INT=0, OOD=0, DEX=0, NFI=0;
+	for(y in data){
+		switch(data[y]["current_status_code"]){
+			case "DEL":
+				++DEL;
+				break;
+			case "INT":
+				++INT;
+				break;
+			case "OOD":
+				++OOD;
+				break;
+			case "DEX":
+				++DEX;
+				break;
+			case "NFI":
+				++NFI;
+				break;
+		}
+	}
+	document.getElementById("del").innerHTML = "DEL: <b>"+DEL+"</b>";
+	document.getElementById("int").innerHTML = "INT: <b>"+INT+"</b>";
+	document.getElementById("ood").innerHTML = "OOD: <b>"+OOD+"</b>";
+	document.getElementById("dex").innerHTML = "DEX: <b>"+DEX+"</b>";
+	document.getElementById("nfi").innerHTML = "NFI: <b>"+NFI+"</b>";
+	
+	showData = document.getElementById("response_json");
+	table = document.getElementById("table");
+	showData.innerHTML = "";
+	table.innerHTML = "<tr><th>AWB NUMBER</th><th>TRANSPORTER</th><th>SOURCE</th><th>DESTINATION</th><th>BRAND</th><th>START DATE</th><th>ETD</th><th>STATUS</th></tr>";
+	for(x in data){
+		table.innerHTML += "<tr><td>"+data[x]["awbno"]+"</td><td>"+data[x]["carrier"]+"</td><td>"+data[x]["from"]+"</td><td>"+data[x]["to"]+"</td><td>"+data[x]["carrier"]+"</td><td>"+data[x]["pickup_date"]+"</td><td>"+data[x]["extra_fields"]["expected_delivery_date"]+"</td><td>"+data[x]["current_status"]+"</td></tr>";
+	}
+}
+document.onload=request_json();
+</script>
+<style>
+#table {
+	border: 1px solid black;
+}
+td {
+	border: 1px solid black;
+}
+span {
+	border: 1px solid blue;
+	background-color: rgba(0, 0, 50, 0.1);
+}
+</style>
+</head>
+<body>
+	<br /><div id="response_json"></div>
+	<br /><div id="dashboard" align="center">
+		<span id="del">DEL</span>
+		<span id="int">INT</span>
+		<span id="ood">ODD</span>
+		<span id="dex">DEX</span>
+		<span id="nfi">NFI</span>
+	</div>
+	<br /><table id="table"></table>
+</body>
+</html>
